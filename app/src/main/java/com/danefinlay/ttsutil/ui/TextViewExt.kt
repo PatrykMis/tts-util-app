@@ -20,9 +20,9 @@
 
 package com.danefinlay.ttsutil.ui
 
-import androidx.core.text.HtmlCompat
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 
 /**
  * Extension function for setting html link text.

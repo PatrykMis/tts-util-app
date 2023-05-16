@@ -21,19 +21,23 @@
 package com.danefinlay.ttsutil.ui
 
 import android.os.Bundle
-import androidx.core.content.pm.PackageInfoCompat
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.core.content.pm.PackageInfoCompat
 import com.danefinlay.ttsutil.APP_NAME
 import com.danefinlay.ttsutil.R
 import org.jetbrains.anko.find
 
 class AboutActivity : MyAppCompatActivity() {
 
-    private fun setAckText(ackTextViewId: Int, ackStringId: Int,
-                           ackLinkStringId: Int, licenceLinkText: String) {
-        val formattedAckText = getString(ackStringId,
-                getString(ackLinkStringId), licenceLinkText)
+    private fun setAckText(
+        ackTextViewId: Int, ackStringId: Int,
+        ackLinkStringId: Int, licenceLinkText: String
+    ) {
+        val formattedAckText = getString(
+            ackStringId,
+            getString(ackLinkStringId), licenceLinkText
+        )
         find<TextView>(ackTextViewId).setLinkText(formattedAckText)
     }
 
@@ -48,7 +52,8 @@ class AboutActivity : MyAppCompatActivity() {
         val info = packageManager.getPackageInfo(APP_NAME, 0)
         val longVersion = PackageInfoCompat.getLongVersionCode(info)
         find<TextView>(R.id.about_version).text = getString(
-                R.string.about_version, info.versionName, longVersion)
+            R.string.about_version, info.versionName, longVersion
+        )
 
         // Set the license text and link.
         val apache2 = getString(R.string.link_apache2)
@@ -57,15 +62,23 @@ class AboutActivity : MyAppCompatActivity() {
         find<TextView>(R.id.about_app).setLinkText(aboutApp)
 
         // Set each acknowledgement text and link.
-        setAckText(R.id.about_ack_material_design_icons,
-                R.string.about_ack_material_design_icons,
-                R.string.link_material_design_icons, apache2)
-        setAckText(R.id.about_ack_kotlin, R.string.about_ack_kotlin,
-                R.string.link_kotlin, apache2)
-        setAckText(R.id.about_ack_anko, R.string.about_ack_anko,
-                R.string.link_anko, apache2)
-        setAckText(R.id.about_ack_free_otp, R.string.about_ack_free_otp,
-                R.string.link_freeotp, apache2)
+        setAckText(
+            R.id.about_ack_material_design_icons,
+            R.string.about_ack_material_design_icons,
+            R.string.link_material_design_icons, apache2
+        )
+        setAckText(
+            R.id.about_ack_kotlin, R.string.about_ack_kotlin,
+            R.string.link_kotlin, apache2
+        )
+        setAckText(
+            R.id.about_ack_anko, R.string.about_ack_anko,
+            R.string.link_anko, apache2
+        )
+        setAckText(
+            R.id.about_ack_free_otp, R.string.about_ack_free_otp,
+            R.string.link_freeotp, apache2
+        )
 
         // Set links under the Translations heading.
         val zhContribLink = getString(R.string.link_mahongyin)
@@ -74,11 +87,12 @@ class AboutActivity : MyAppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when ( item.itemId ) {
+        return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

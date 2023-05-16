@@ -45,18 +45,21 @@ import android.text.TextWatcher
  * also treated as delimiters.
  *
  */
- abstract class InputTextReader : TextWatcher {
+abstract class InputTextReader : TextWatcher {
 
     abstract fun readChangedText(text: CharSequence)
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int,
-                                   after: Int) {}
+    override fun beforeTextChanged(
+        s: CharSequence?, start: Int, count: Int,
+        after: Int
+    ) {
+    }
 
     protected open fun charIsDelimiter(char: Char): Boolean {
         // Note: Since it is not too much trouble, we include the Unicode
         // "Halfwidth and Fullwidth Forms" for each specific delimiter.
         val cp = char.code
-        return     cp == 0x0021 || cp == 0xff01 // Exclamation marks.
+        return cp == 0x0021 || cp == 0xff01 // Exclamation marks.
                 || cp == 0x0022 || cp == 0xff02 // Quotation marks.
                 || cp == 0x002c || cp == 0xff0c // Commas.
                 || cp == 0xff64
@@ -69,8 +72,10 @@ import android.text.TextWatcher
                 || char.isWhitespace()
     }
 
-    override fun onTextChanged(s: CharSequence?, start: Int,
-                               before: Int, count: Int) {
+    override fun onTextChanged(
+        s: CharSequence?, start: Int,
+        before: Int, count: Int
+    ) {
         // Do nothing if the character sequence is null or if a deletion occurred.
         if (s == null || count < before) return
 
@@ -87,7 +92,7 @@ import android.text.TextWatcher
         else if (count == 1 && startsWithDelimiter) {
             val builder = StringBuilder()
             builder.append(startChar)
-            for (i in start-1 downTo 0) {
+            for (i in start - 1 downTo 0) {
                 val char = s[i]
                 if (charIsDelimiter(char)) break
                 builder.append(char)

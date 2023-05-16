@@ -40,32 +40,34 @@ import java.util.*
  * Abstract activity class inherited from classes that use text-to-speech in some
  * way.
  */
-abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
-        ActivityInterface, TaskProgressObserver {
+abstract class TTSActivity : MyAppCompatActivity(), TextToSpeech.OnInitListener,
+    ActivityInterface, TaskProgressObserver {
 
     private val idleStatusEvent =
-            ActivityEvent.StatusUpdateEvent(100, TASK_ID_IDLE, 0)
+        ActivityEvent.StatusUpdateEvent(100, TASK_ID_IDLE, 0)
 
     protected var mLastStatusUpdate = idleStatusEvent
     private var mLastChosenDirEvent: ActivityEvent.ChosenFileEvent? = null
     private var mLastChosenFileEvent: ActivityEvent.ChosenFileEvent? = null
 
-    private fun retrieveChosenFileData(prefs: SharedPreferences, uriKey: String,
-                                       nameKey: String, localeKeyPrefix: String,
-                                       requestCode: Int):
+    private fun retrieveChosenFileData(
+        prefs: SharedPreferences, uriKey: String,
+        nameKey: String, localeKeyPrefix: String,
+        requestCode: Int
+    ):
             ActivityEvent.ChosenFileEvent? {
         // Retrieve the saved chosen file data.
         val uriPrefString = prefs.getString(uriKey, "") ?: return null
         val displayNamePrefString = prefs.getString(nameKey, null)
-                ?: return null
+            ?: return null
 
         // Note: The Uri and display names are delimited by null characters to
         // This is done to avoid mangling; filenames cannot typically include this
         // character.
         val uriList = uriPrefString.split(Char.MIN_VALUE).filter { it.length > 0 }
-                .map { Uri.parse(it) }
+            .map { Uri.parse(it) }
         var displayNames = displayNamePrefString.split(Char.MIN_VALUE)
-                .filter { it.length > 0 }
+            .filter { it.length > 0 }
 
         // Retrieve the locale associated with the display names from shared
         // preferences.
@@ -91,13 +93,17 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
             }
             displayNames = newDisplayNames
         }
-        return ActivityEvent.ChosenFileEvent(uriList, displayNames, newLocale,
-                requestCode)
+        return ActivityEvent.ChosenFileEvent(
+            uriList, displayNames, newLocale,
+            requestCode
+        )
     }
 
-    private fun saveChosenFileData(prefs: SharedPreferences, uriKey: String,
-                                   nameKey: String, localeKeyPrefix: String,
-                                   event: ActivityEvent.ChosenFileEvent) {
+    private fun saveChosenFileData(
+        prefs: SharedPreferences, uriKey: String,
+        nameKey: String, localeKeyPrefix: String,
+        event: ActivityEvent.ChosenFileEvent
+    ) {
         // Save chosen file data delimited by null characters.
         val uriString = event.uriList.fold("") { acc, uri ->
             acc + uri.toString() + Char.MIN_VALUE
@@ -112,12 +118,12 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
 
         // Save data to shared preferences.
         prefs.edit()
-                .putString(uriKey, uriString)
-                .putString(nameKey, displayNamesString)
-                .putString(localeKeyPrefix + "_LANG", locale.language)
-                .putString(localeKeyPrefix + "_COUNTRY", locale.country)
-                .putString(localeKeyPrefix + "_VARIANT", locale.variant)
-                .apply()  // apply() is asynchronous.
+            .putString(uriKey, uriString)
+            .putString(nameKey, displayNamesString)
+            .putString(localeKeyPrefix + "_LANG", locale.language)
+            .putString(localeKeyPrefix + "_COUNTRY", locale.country)
+            .putString(localeKeyPrefix + "_VARIANT", locale.variant)
+            .apply()  // apply() is asynchronous.
     }
 
     private fun restoreLastStatusUpdate(savedInstanceState: Bundle):
@@ -126,9 +132,10 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         // if it is out-of-date or unavailable.
         // Note: This preserves task success/failure statuses.
         var result: ActivityEvent.StatusUpdateEvent? =
-                savedInstanceState.getParcelable("mLastStatusUpdate")
+            savedInstanceState.getParcelable("mLastStatusUpdate")
         if (result == null || result.progress in 0..99 &&
-                        !myApplication.taskInProgress) result = idleStatusEvent
+            !myApplication.taskInProgress
+        ) result = idleStatusEvent
         return result
     }
 
@@ -156,8 +163,10 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         }
     }
 
-    protected fun handleActivityEvent(event: ActivityEvent,
-                                      fragments: List<Fragment>) {
+    protected fun handleActivityEvent(
+        event: ActivityEvent,
+        fragments: List<Fragment>
+    ) {
         // Iterate each attached fragment and, if it implements the right interface,
         // use it to handle this event.
         for (fragment in fragments) {
@@ -189,13 +198,13 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         // case, defaults to an available voice.
         val language = tts.currentLocale
         var languageUnavailable: Boolean =
-                language == null ||
-                tts.isLanguageAvailable(language) == LANG_MISSING_DATA
+            language == null ||
+                    tts.isLanguageAvailable(language) == LANG_MISSING_DATA
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             languageUnavailable =
-                    (languageUnavailable || language == null ||
-                    tts.countAvailableVoices(language) == 0) &&
-                    tts.voicesEx.size > 0 // Engine reports one or more voices.
+                (languageUnavailable || language == null ||
+                        tts.countAvailableVoices(language) == 0) &&
+                        tts.voicesEx.size > 0 // Engine reports one or more voices.
         }
         if (languageUnavailable) {
             runOnUiThread { showNoTTSDataDialog(tts, language) }
@@ -218,8 +227,9 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
             val engine = tts.engines.find { it.name == engineName }!!
 
             // Set the message text.
-            val messageText = getString(R.string.no_tts_data_alert_message,
-                    language?.displayName, engine.label
+            val messageText = getString(
+                R.string.no_tts_data_alert_message,
+                language?.displayName, engine.label
             )
             message(messageText)
 
@@ -264,8 +274,10 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         }
     }
 
-    private fun startFileChooserActivity(intent: Intent, chooserTitle: String,
-                                         requestCode: Int) {
+    private fun startFileChooserActivity(
+        intent: Intent, chooserTitle: String,
+        requestCode: Int
+    ) {
         try {
             val chooserIntent = Intent.createChooser(intent, chooserTitle)
             startActivityForResult(chooserIntent, requestCode)
@@ -304,8 +316,8 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         // read/write permission.
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         val flags =
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                 Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
                 Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
         intent.addFlags(flags)
@@ -326,8 +338,10 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         // shared preferences, if necessary.
         if (mLastChosenFileEvent == null) {
             val prefs = getSharedPreferences(packageName, MODE_PRIVATE)
-            val event = retrieveChosenFileData(prefs, CHOSEN_FILE_URI_KEY,
-                    CHOSEN_FILE_NAME_KEY, CHOSEN_FILE_LOCALE_KEY, FILE_SELECT_CODE)
+            val event = retrieveChosenFileData(
+                prefs, CHOSEN_FILE_URI_KEY,
+                CHOSEN_FILE_NAME_KEY, CHOSEN_FILE_LOCALE_KEY, FILE_SELECT_CODE
+            )
             if (event != null) mLastChosenFileEvent = event
         }
         return mLastChosenFileEvent
@@ -344,8 +358,10 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
         // shared preferences, if necessary.
         if (mLastChosenDirEvent == null) {
             val prefs = getSharedPreferences(packageName, MODE_PRIVATE)
-            val event = retrieveChosenFileData(prefs, CHOSEN_DIR_URI_KEY,
-                    CHOSEN_DIR_NAME_KEY, CHOSEN_DIR_LOCALE_KEY, DIR_SELECT_CODE)
+            val event = retrieveChosenFileData(
+                prefs, CHOSEN_DIR_URI_KEY,
+                CHOSEN_DIR_NAME_KEY, CHOSEN_DIR_LOCALE_KEY, DIR_SELECT_CODE
+            )
             if (event != null) mLastChosenDirEvent = event
         }
         return mLastChosenDirEvent
@@ -354,13 +370,17 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
     override fun notifyProgress(progress: Int, taskId: Int, remainingTasks: Int) {
         // Inform each compatible fragment of the progress via a status update
         // event.  Ensure that this runs on the main thread.
-        val event = ActivityEvent.StatusUpdateEvent(progress, taskId,
-                remainingTasks)
+        val event = ActivityEvent.StatusUpdateEvent(
+            progress, taskId,
+            remainingTasks
+        )
         runOnUiThread { handleActivityEvent(event) }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int,
-                                  data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
 
         // Disable notifications on reentry.  This prevents notifications from being
@@ -370,7 +390,7 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
 
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 &&
-            requestCode == SAMPLE_TEXT_CODE -> {
+                    requestCode == SAMPLE_TEXT_CODE -> {
                 // Note: Sample text may be available if resultCode is
                 // RESULT_CANCELLED.  Therefore, we do not check resultCode.
                 // This apparent error may be explained by the peculiar nature of
@@ -384,7 +404,7 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
                 if (data != null && data.hasExtra(key)) {
                     sampleText = data.getStringExtra(key)
                 }
-                if (sampleText == null || sampleText.isBlank()){
+                if (sampleText == null || sampleText.isBlank()) {
                     sampleText = getString(R.string.sample_tts_sentence)
                 }
 
@@ -392,8 +412,9 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
                 val event = ActivityEvent.SampleTextReceivedEvent(sampleText)
                 handleActivityEvent(event)
             }
+
             requestCode == DIR_SELECT_CODE && resultCode == RESULT_OK ||
-            requestCode == DIR_SELECT_CONT_CODE && resultCode == RESULT_OK -> {
+                    requestCode == DIR_SELECT_CONT_CODE && resultCode == RESULT_OK -> {
                 // Get the Uri of the selected directory, if possible.
                 val uri = data?.data ?: return
 
@@ -401,8 +422,8 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
                 // necessary.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     val flags =
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     contentResolver.takePersistableUriPermission(uri, flags)
                 }
 
@@ -413,18 +434,23 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
                 val systemLocale = currentSystemLocale ?: return
 
                 // Create a file chosen event.
-                val event = ActivityEvent.ChosenFileEvent(listOf(uri),
-                        listOf(displayName), systemLocale, requestCode)
+                val event = ActivityEvent.ChosenFileEvent(
+                    listOf(uri),
+                    listOf(displayName), systemLocale, requestCode
+                )
 
                 // Set shared preference and property values.
                 val prefs = getSharedPreferences(packageName, MODE_PRIVATE)
-                saveChosenFileData(prefs, CHOSEN_DIR_URI_KEY, CHOSEN_DIR_NAME_KEY,
-                        CHOSEN_DIR_LOCALE_KEY, event)
+                saveChosenFileData(
+                    prefs, CHOSEN_DIR_URI_KEY, CHOSEN_DIR_NAME_KEY,
+                    CHOSEN_DIR_LOCALE_KEY, event
+                )
                 mLastChosenDirEvent = event
 
                 // Dispatch the event.
                 handleActivityEvent(event)
             }
+
             requestCode == FILE_SELECT_CODE && resultCode == RESULT_OK -> {
                 // Get the Uri of the selected file(s), if possible.
                 if (data == null) return
@@ -458,13 +484,17 @@ abstract class TTSActivity: MyAppCompatActivity(), TextToSpeech.OnInitListener,
                 val systemLocale = currentSystemLocale ?: return
 
                 // Create the file chosen event.
-                val event = ActivityEvent.ChosenFileEvent(uriList, displayNames,
-                        systemLocale, requestCode)
+                val event = ActivityEvent.ChosenFileEvent(
+                    uriList, displayNames,
+                    systemLocale, requestCode
+                )
 
                 // Set shared preference and property values.
-                saveChosenFileData(getSharedPreferences(packageName, MODE_PRIVATE),
-                        CHOSEN_FILE_URI_KEY, CHOSEN_FILE_NAME_KEY,
-                        CHOSEN_FILE_LOCALE_KEY, event)
+                saveChosenFileData(
+                    getSharedPreferences(packageName, MODE_PRIVATE),
+                    CHOSEN_FILE_URI_KEY, CHOSEN_FILE_NAME_KEY,
+                    CHOSEN_FILE_LOCALE_KEY, event
+                )
                 mLastChosenFileEvent = event
 
                 // Dispatch the event.

@@ -56,8 +56,10 @@ class ApplicationEx : Application(), OnInitListener {
     private var notificationsEnabled: Boolean = false
 
     private val asyncProgressObserver = object : TaskProgressObserver {
-        override fun notifyProgress(progress: Int, taskId: Int,
-                                    remainingTasks: Int) {
+        override fun notifyProgress(
+            progress: Int, taskId: Int,
+            remainingTasks: Int
+        ) {
             // Submit a executor task to call the application's notifyProgress()
             // procedure.
             notifyingExecService.submit {
@@ -67,20 +69,22 @@ class ApplicationEx : Application(), OnInitListener {
     }
 
     val readingTaskInProgress: Boolean
-        get () {
+        get() {
             val readingTasks = listOf(TASK_ID_READ_TEXT)
             return taskInProgress && taskQueue.peek()?.taskId in readingTasks
         }
 
     val fileSynthesisTaskInProgress: Boolean
-        get () {
-            val fileSynthesisTasks = listOf(TASK_ID_WRITE_FILE,
-                    TASK_ID_PROCESS_FILE)
+        get() {
+            val fileSynthesisTasks = listOf(
+                TASK_ID_WRITE_FILE,
+                TASK_ID_PROCESS_FILE
+            )
             return taskInProgress && taskQueue.peek()?.taskId in fileSynthesisTasks
         }
 
     val taskInProgress: Boolean
-        get () = taskQueue.peek()?.progress in 0..99
+        get() = taskQueue.peek()?.progress in 0..99
 
     private val unfinishedTaskCount: Int
         get() {
@@ -109,22 +113,21 @@ class ApplicationEx : Application(), OnInitListener {
     private val audioFocusRequest: AudioFocusRequest by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val audioAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
-                    .build()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+                .build()
             AudioFocusRequest.Builder(audioFocusGain)
-                    .setAudioAttributes(audioAttributes)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(onAudioFocusChangeListener)
-                    .build()
+                .setAudioAttributes(audioAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(onAudioFocusChangeListener)
+                .build()
         } else
             throw RuntimeException("should not use AudioFocusRequest below SDK v26")
     }
 
-    private val onAudioFocusChangeListener = OnAudioFocusChangeListener {
-        focusChange ->
-        when ( focusChange ) {
+    private val onAudioFocusChangeListener = OnAudioFocusChangeListener { focusChange ->
+        when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS,
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
@@ -140,8 +143,9 @@ class ApplicationEx : Application(), OnInitListener {
         } else {
             @Suppress("deprecation")
             audioManager.requestAudioFocus(
-                    onAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
-                    audioFocusGain)
+                onAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
+                audioFocusGain
+            )
         }
 
         // Check the success value.
@@ -206,9 +210,8 @@ class ApplicationEx : Application(), OnInitListener {
 
         // Try to get the preferred engine package from shared preferences if
         // it is null.
-        val engineName = preferredEngine ?:
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .getString("pref_tts_engine", null)
+        val engineName = preferredEngine ?: PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("pref_tts_engine", null)
 
         // Prepare the OnInitListener.
         val wrappedListener = OnInitListener { status ->
@@ -255,13 +258,16 @@ class ApplicationEx : Application(), OnInitListener {
             // available.
             message = getString(R.string.no_tts_language_available_msg)
         } else if (startLocale == null || startLocale.language != locale.language ||
-                startLocale.country != locale.country) {
+            startLocale.country != locale.country
+        ) {
             // A language is available, but it is one that the user might not be
             // expecting.
-            message = getString(R.string.using_general_tts_language_msg,
-                    locale.displayName)
+            message = getString(
+                R.string.using_general_tts_language_msg,
+                locale.displayName
+            )
         }
-        if (message != null)  runOnUiThread { longToast(message) }
+        if (message != null) runOnUiThread { longToast(message) }
 
         // Save the message if failure is indicated.
         if (!success) ttsInitErrorMessage = message
@@ -274,7 +280,7 @@ class ApplicationEx : Application(), OnInitListener {
     override fun onInit(status: Int) {
         // Handle errors.
         val tts = mTTS
-        if (status == TextToSpeech.ERROR || tts == null) {
+        if (status == ERROR || tts == null) {
             // Check the number of available TTS engines and set an appropriate
             // error message.
             val engines = tts?.engines ?: listOf()
@@ -374,34 +380,44 @@ class ApplicationEx : Application(), OnInitListener {
                 val notReadyMessage = errorMessage ?: defaultMessage
                 runOnUiThread { longToast(notReadyMessage) }
             }
+
             TTS_BUSY -> {
                 // Inform the user that the application is currently busy performing
                 // another operation.
                 val currentTaskTextId = when (taskQueue.peek()?.taskId) {
                     TASK_ID_READ_TEXT ->
                         R.string.reading_notification_title
+
                     TASK_ID_WRITE_FILE ->
                         R.string.synthesis_notification_title
+
                     TASK_ID_PROCESS_FILE ->
                         R.string.post_synthesis_notification_title
+
                     else -> return
                 }
-                val message = getString(R.string.tts_busy_message,
-                        getString(currentTaskTextId))
+                val message = getString(
+                    R.string.tts_busy_message,
+                    getString(currentTaskTextId)
+                )
                 runOnUiThread { longToast(message) }
             }
+
             UNAVAILABLE_OUT_DIR -> {
                 val message = getString(R.string.unavailable_out_dir_message)
                 runOnUiThread { longToast(message) }
             }
+
             UNAVAILABLE_INPUT_SRC -> {
                 val message = getString(R.string.unavailable_input_src_message)
                 runOnUiThread { longToast(message) }
             }
+
             UNWRITABLE_OUT_DIR -> {
                 val message = getString(R.string.unwritable_out_dir_message)
                 runOnUiThread { longToast(message) }
             }
+
             ZERO_LENGTH_INPUT -> {
                 val messageId = when (lastAttemptedTaskId) {
                     TASK_ID_READ_TEXT -> R.string.cannot_read_empty_input_message
@@ -429,8 +445,10 @@ class ApplicationEx : Application(), OnInitListener {
         releaseAudioFocus()
     }
 
-    fun reinitialiseTTS(initListener: OnInitListener,
-                        preferredEngine: String?) {
+    fun reinitialiseTTS(
+        initListener: OnInitListener,
+        preferredEngine: String?
+    ) {
         freeTTS()
         setupTTS(initListener, preferredEngine)
     }
@@ -462,10 +480,10 @@ class ApplicationEx : Application(), OnInitListener {
             val title = getNotificationTitle(this, taskData)
             val text = getNotificationText(this, taskData, remainingTasks)
             val notification = builder
-                    .setContentTitle(title)
-                    .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-                    .setProgress(100, progress, false)
-                    .build()
+                .setContentTitle(title)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setProgress(100, progress, false)
+                .build()
             notificationManager.notify(taskId, notification)
         }
 
@@ -551,8 +569,10 @@ class ApplicationEx : Application(), OnInitListener {
         if (inputSize == 0L) return ZERO_LENGTH_INPUT
 
         // Initialize the task, begin it asynchronously and return.
-        val task = ReadInputTask(this, tts, inputStream, inputSize,
-                taskData.queueMode, asyncProgressObserver)
+        val task = ReadInputTask(
+            this, tts, inputStream, inputSize,
+            taskData.queueMode, asyncProgressObserver
+        )
         currentTask = task
         userTaskExecService.submit { task.begin() }
         return SUCCESS
@@ -594,8 +614,10 @@ class ApplicationEx : Application(), OnInitListener {
         val inWaveFiles = taskData.inWaveFiles
 
         // Initialize the task, begin it asynchronously and return.
-        val task = FileSynthesisTask(this, tts, inputStream, inputSize,
-                waveFilename, inWaveFiles, asyncProgressObserver)
+        val task = FileSynthesisTask(
+            this, tts, inputStream, inputSize,
+            waveFilename, inWaveFiles, asyncProgressObserver
+        )
         currentTask = task
         userTaskExecService.submit { task.begin() }
         return SUCCESS
@@ -614,12 +636,16 @@ class ApplicationEx : Application(), OnInitListener {
         val outDirectory = prevTaskData.outDirectory
         val waveFilename = prevTaskData.waveFilename
         if (!outDirectory.exists(this)) return UNAVAILABLE_OUT_DIR
-        val outputStream = outDirectory.openDocumentOutputStream(this,
-                waveFilename, "audio/x-wav") ?: return UNWRITABLE_OUT_DIR
+        val outputStream = outDirectory.openDocumentOutputStream(
+            this,
+            waveFilename, "audio/x-wav"
+        ) ?: return UNWRITABLE_OUT_DIR
 
         // Initialize the task, begin it asynchronously and return.
-        val task = ProcessWaveFilesTask(this, asyncProgressObserver,
-                prevTaskData.inWaveFiles, outputStream, waveFilename)
+        val task = ProcessWaveFilesTask(
+            this, asyncProgressObserver,
+            prevTaskData.inWaveFiles, outputStream, waveFilename
+        )
         currentTask = task
         userTaskExecService.submit { task.begin() }
         return SUCCESS
@@ -643,11 +669,13 @@ class ApplicationEx : Application(), OnInitListener {
                     infoMessageId = R.string.begin_reading_source_message
                     srcDescription = taskData.inputSource.description
                 }
+
                 is TaskData.FileSynthesisTaskData -> {
                     result = synthesizeToFile(taskData)
                     infoMessageId = R.string.begin_synthesizing_source_message
                     srcDescription = taskData.inputSource.description
                 }
+
                 is TaskData.ProcessWaveFilesTaskData -> {
                     result = processWaveFiles(taskData)
                     infoMessageId = R.string.begin_processing_source_message
@@ -694,8 +722,10 @@ class ApplicationEx : Application(), OnInitListener {
         }
 
         // Encapsulate task data and add it to the queue.
-        val taskData = TaskData.ReadInputTaskData(TASK_ID_READ_TEXT, 0,
-                inputSource, queueMode)
+        val taskData = TaskData.ReadInputTaskData(
+            TASK_ID_READ_TEXT, 0,
+            inputSource, queueMode
+        )
         taskQueue.add(taskData)
 
         // Process the task if it is at the head of the queue.  Otherwise, notify
@@ -703,19 +733,25 @@ class ApplicationEx : Application(), OnInitListener {
         return beginTaskOrNotify(taskData, currentTask != null)
     }
 
-    fun enqueueFileSynthesisTasks(inputSource: InputSource, outDirectory: Directory,
-                                  waveFilename: String): Int {
+    fun enqueueFileSynthesisTasks(
+        inputSource: InputSource, outDirectory: Directory,
+        waveFilename: String
+    ): Int {
         // Do not continue unless TTS is ready.
         if (mTTS == null) return TTS_NOT_READY
 
         // Encapsulate the file synthesis task data and add it to the queue.
-        val taskData1 = TaskData.FileSynthesisTaskData(TASK_ID_WRITE_FILE, 0,
-                inputSource, outDirectory, waveFilename, mutableListOf())
+        val taskData1 = TaskData.FileSynthesisTaskData(
+            TASK_ID_WRITE_FILE, 0,
+            inputSource, outDirectory, waveFilename, mutableListOf()
+        )
         taskQueue.add(taskData1)
 
         // Encapsulate the process wave files task data and add it to the queue.
-        val taskData2 = TaskData.ProcessWaveFilesTaskData(TASK_ID_PROCESS_FILE, 0,
-                taskData1)
+        val taskData2 = TaskData.ProcessWaveFilesTaskData(
+            TASK_ID_PROCESS_FILE, 0,
+            taskData1
+        )
         taskQueue.add(taskData2)
 
         // Process the task if it is at the head of the queue.  Otherwise, notify

@@ -27,8 +27,14 @@ import android.os.Build
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
+import com.danefinlay.ttsutil.ApplicationEx
+import com.danefinlay.ttsutil.DIR_SELECT_CONT_CODE
 import com.danefinlay.ttsutil.R
-import com.danefinlay.ttsutil.*
+import com.danefinlay.ttsutil.REQUEST_EXTERNAL_STORAGE
+import com.danefinlay.ttsutil.TASK_ID_IDLE
+import com.danefinlay.ttsutil.TASK_ID_PROCESS_FILE
+import com.danefinlay.ttsutil.TASK_ID_READ_TEXT
+import com.danefinlay.ttsutil.TASK_ID_WRITE_FILE
 import org.jetbrains.anko.AlertDialogBuilder
 import org.jetbrains.anko.longToast
 
@@ -93,7 +99,8 @@ abstract class MyFragment : Fragment(), FragmentInterface {
         // Check if we have write permission.
         if (Build.VERSION.SDK_INT >= 23 && Build.VERSION.SDK_INT < 29) {
             val permission = ctx.checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // We don't have permission, so prompt the user.
                 requestPermissions(PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE)
@@ -101,8 +108,7 @@ abstract class MyFragment : Fragment(), FragmentInterface {
                 // Store the function so we can execute it later if the user
                 // grants us storage permission.
                 tempStoragePermissionBlock = block
-            }
-            else {
+            } else {
                 // We have permission, so execute the function.
                 block(true)
             }
@@ -113,9 +119,11 @@ abstract class MyFragment : Fragment(), FragmentInterface {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<out String>,
-                                            grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (permissions.contentEquals(PERMISSIONS_STORAGE)) {
@@ -201,12 +209,12 @@ abstract class MyFragment : Fragment(), FragmentInterface {
         private val PERMISSIONS_STORAGE: Array<String> by lazy {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 arrayOf(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             } else {
                 arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             }
         }

@@ -140,16 +140,20 @@ class TTSIntentService : IntentService("TTSIntentService") {
     }
 
     companion object {
-        private inline fun startAction(ctx: Context, actionString: String,
-                                       block: Intent.() -> Unit) {
+        private inline fun startAction(
+            ctx: Context, actionString: String,
+            block: Intent.() -> Unit
+        ) {
             val intent = Intent(ctx, TTSIntentService::class.java)
             intent.action = actionString
             intent.block()
             ctx.startService(intent)
         }
 
-        private fun startTextAction(ctx: Context, actionString: String,
-                                    text: String?) {
+        private fun startTextAction(
+            ctx: Context, actionString: String,
+            text: String?
+        ) {
             startAction(ctx, actionString) { putExtra(EXTRA_TEXT, text) }
         }
 
@@ -161,7 +165,7 @@ class TTSIntentService : IntentService("TTSIntentService") {
          */
         @JvmStatic
         fun startActionReadText(ctx: Context, text: String?) =
-                startTextAction(ctx, ACTION_READ_TEXT, text)
+            startTextAction(ctx, ACTION_READ_TEXT, text)
 
         /**
          * Starts this service to perform action EditReadText. If the service is
@@ -171,7 +175,7 @@ class TTSIntentService : IntentService("TTSIntentService") {
          */
         @JvmStatic
         fun startActionEditReadText(ctx: Context, text: String) =
-                startTextAction(ctx, ACTION_EDIT_READ_TEXT, text)
+            startTextAction(ctx, ACTION_EDIT_READ_TEXT, text)
 
         /**
          * Starts this service to perform action ReadClipboard. If the service is
@@ -181,7 +185,7 @@ class TTSIntentService : IntentService("TTSIntentService") {
          */
         @JvmStatic
         fun startActionReadClipboard(ctx: Context) =
-                startAction(ctx, ACTION_READ_CLIPBOARD) {}
+            startAction(ctx, ACTION_READ_CLIPBOARD) {}
 
         /**
          * Starts this service to perform action EditReadClipboard. If the service
@@ -191,7 +195,7 @@ class TTSIntentService : IntentService("TTSIntentService") {
          */
         @JvmStatic
         fun startActionEditReadClipboard(ctx: Context) =
-                startAction(ctx, ACTION_EDIT_READ_CLIPBOARD) {}
+            startAction(ctx, ACTION_EDIT_READ_CLIPBOARD) {}
 
         /**
          * Starts this service to perform action StopSpeaking. If the service is
@@ -201,8 +205,8 @@ class TTSIntentService : IntentService("TTSIntentService") {
          */
         @JvmStatic
         fun startActionStopSpeaking(ctx: Context, taskId: Int) =
-                startAction(ctx, ACTION_STOP_SPEAKING) {
-                    putExtra("taskId", taskId)
-                }
+            startAction(ctx, ACTION_STOP_SPEAKING) {
+                putExtra("taskId", taskId)
+            }
     }
 }

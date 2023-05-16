@@ -30,8 +30,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import com.danefinlay.ttsutil.*
-import org.jetbrains.anko.*
+import com.danefinlay.ttsutil.DIR_SELECT_CODE
+import com.danefinlay.ttsutil.DIR_SELECT_CONT_CODE
+import com.danefinlay.ttsutil.Directory
+import com.danefinlay.ttsutil.FILE_SELECT_CODE
+import com.danefinlay.ttsutil.InputSource
+import com.danefinlay.ttsutil.R
+import com.danefinlay.ttsutil.SUCCESS
+import com.danefinlay.ttsutil.UNAVAILABLE_INPUT_SRC
+import com.danefinlay.ttsutil.UNAVAILABLE_OUT_DIR
+import com.danefinlay.ttsutil.UNWRITABLE_OUT_DIR
+import org.jetbrains.anko.AlertDialogBuilder
+import org.jetbrains.anko.longToast
+import org.jetbrains.anko.onClick
 
 abstract class FileChooserFragment : MyFragment() {
 
@@ -55,8 +66,10 @@ abstract class FileChooserFragment : MyFragment() {
         else if (event.displayNameList.size > 1) {
             val fileCount = event.displayNameList.size - 1
             val fileWord = resources.getQuantityString(R.plurals.files, fileCount)
-            text = getString(R.string.multiple_chosen_files, text, fileCount,
-                    fileWord)
+            text = getString(
+                R.string.multiple_chosen_files, text, fileCount,
+                fileWord
+            )
         }
         find<TextView>(R.id.chosen_filename).text = text
     }
@@ -67,6 +80,7 @@ abstract class FileChooserFragment : MyFragment() {
             is ActivityEvent.ChosenFileEvent -> {
                 if (event.requestCode == FILE_SELECT_CODE) onFileChosen(event)
             }
+
             else -> {}
         }
     }
@@ -75,7 +89,10 @@ abstract class FileChooserFragment : MyFragment() {
             AlertDialogBuilder {
         // Use a different title and message based on whether or not a file has been
         // chosen already.
-        val title: Int; val message: Int; val positive: Int; val negative: Int
+        val title: Int
+        val message: Int
+        val positive: Int
+        val negative: Int
         if (uriList == null || uriList.size == 0) {
             title = R.string.no_file_chosen_dialog_title
             message = R.string.no_file_chosen_dialog_message
@@ -102,12 +119,14 @@ abstract class FileChooserFragment : MyFragment() {
 class ReadFilesFragment : FileChooserFragment() {
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_read_files, container,
-                false)
+        return inflater.inflate(
+            R.layout.fragment_read_files, container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -117,7 +136,7 @@ class ReadFilesFragment : FileChooserFragment() {
         find<ImageButton>(R.id.play_file_button).onClick { onClickPlay() }
         find<ImageButton>(R.id.save_button).onClick { onClickSave() }
         find<ImageButton>(R.id.choose_file_button)
-                .onClick { activityInterface?.showFileChooser() }
+            .onClick { activityInterface?.showFileChooser() }
 
         // Set the choose directory button's OnClick listener.  Choosing the output
         // directory is not possible on versions older than Android Lollipop (21).
@@ -180,14 +199,17 @@ class ReadFilesFragment : FileChooserFragment() {
             when (result) {
                 UNAVAILABLE_INPUT_SRC ->
                     buildUnavailableFileAlertDialog(uriList).show()
+
                 else -> myApplication.handleTTSOperationResult(result)
             }
             if (result != SUCCESS) break
         }
     }
 
-    private fun synthesizeTextToFile(event: ActivityEvent.ChosenFileEvent,
-                                     directory: Directory, storageAccess: Boolean) {
+    private fun synthesizeTextToFile(
+        event: ActivityEvent.ChosenFileEvent,
+        directory: Directory, storageAccess: Boolean
+    ) {
         if (!storageAccess) {
             // Show a dialog if we don't have read/write storage permission.
             // and return here if permission is granted.
@@ -207,15 +229,20 @@ class ReadFilesFragment : FileChooserFragment() {
         } else for ((uri, displayName) in fileData) {
             val waveFilename = "$displayName.wav"
             val inputSource = InputSource.DocumentUri(uri, displayName)
-            val result = myApplication.enqueueFileSynthesisTasks(inputSource,
-                    directory, waveFilename)
+            val result = myApplication.enqueueFileSynthesisTasks(
+                inputSource,
+                directory, waveFilename
+            )
             when (result) {
                 UNAVAILABLE_INPUT_SRC ->
                     buildUnavailableFileAlertDialog(event.uriList).show()
+
                 UNAVAILABLE_OUT_DIR ->
                     buildUnavailableDirAlertDialog().show()
+
                 UNWRITABLE_OUT_DIR ->
                     buildUnwritableOutDirAlertDialog().show()
+
                 else -> myApplication.handleTTSOperationResult(result)
             }
             if (result != SUCCESS) break
@@ -248,21 +275,31 @@ class ReadFilesFragment : FileChooserFragment() {
         // Determine the names of the wave file and directory.
         val filename = event1.firstDisplayName
         val dirDisplayName: String = event2?.firstDisplayName
-                ?: getString(R.string.default_output_dir)
+            ?: getString(R.string.default_output_dir)
 
         // Build and display an appropriate alert dialog.
         AlertDialogBuilder(ctx).apply {
             title(R.string.write_to_file_alert_title)
             if (event1.displayNameList.size == 1) {
                 val waveFilename = "$filename.wav"
-                message(getString(R.string.write_to_file_alert_message_1,
-                        filename, waveFilename, dirDisplayName))
+                message(
+                    getString(
+                        R.string.write_to_file_alert_message_1,
+                        filename, waveFilename, dirDisplayName
+                    )
+                )
             } else {
                 val fileCount = event1.displayNameList.size - 1
-                val fileWord = resources.getQuantityString(R.plurals.files,
-                        fileCount)
-                message(getString(R.string.write_to_file_alert_message_2,
-                        filename, fileCount, fileWord, dirDisplayName))
+                val fileWord = resources.getQuantityString(
+                    R.plurals.files,
+                    fileCount
+                )
+                message(
+                    getString(
+                        R.string.write_to_file_alert_message_2,
+                        filename, fileCount, fileWord, dirDisplayName
+                    )
+                )
             }
             positiveButton(R.string.alert_positive_message_2) {
                 // Ask the user for write permission if necessary.

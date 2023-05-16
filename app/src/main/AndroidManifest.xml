@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
    - TTS Util
    -
    - Authors: Dane Finlay <dane@danefinlay.net>
@@ -23,7 +22,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
         tools:ignore="ScopedStorage" />
 
@@ -63,8 +63,8 @@
             android:label="@string/about_activity_label" />
         <activity
             android:name=".ui.EditReadActivity"
-            android:label="@string/edit_read_activity_label"
             android:exported="true"
+            android:label="@string/edit_read_activity_label"
             android:launchMode="singleTop"
             android:taskAffinity="">
             <intent-filter>
@@ -82,8 +82,8 @@
             android:theme="@style/Theme.AppCompat.DayNight" />
         <activity
             android:name=".ui.ReadTextActivity"
-            android:label="@string/read_text_fragment_label"
             android:exported="true"
+            android:label="@string/read_text_fragment_label"
             android:taskAffinity=""
             android:theme="@style/Theme.AppCompat.DayNight">
             <intent-filter>
@@ -96,8 +96,8 @@
         </activity>
         <activity
             android:name=".ui.TextActionActivity"
-            android:label="@string/read_text_fragment_label"
             android:exported="true"
+            android:label="@string/read_text_fragment_label"
             android:taskAffinity=""
             android:theme="@style/Theme.AppCompat.DayNight">
             <intent-filter>

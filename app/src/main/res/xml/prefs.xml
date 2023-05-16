@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
    - TTS Util
    -
    - Authors: Dane Finlay <dane@danefinlay.net>
@@ -19,138 +18,136 @@
    - limitations under the License.
    -->
 
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/settings_fragment_label" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_fragment_label">
 
-    <PreferenceCategory
-        android:title="@string/pref_tts_engine_category" >
+    <PreferenceCategory android:title="@string/pref_tts_engine_category">
 
         <Preference
+            android:icon="@drawable/ic_apps"
             android:key="pref_tts_engine"
-            android:title="@string/pref_tts_engine"
             android:summary="@string/pref_tts_engine_summary"
-            android:icon="@drawable/ic_apps" />
+            android:title="@string/pref_tts_engine" />
 
         <Preference
+            android:icon="@drawable/ic_language"
             android:key="pref_tts_voice"
-            android:title="@string/pref_tts_voice"
             android:summary="@string/pref_tts_voice_summary"
-            android:icon="@drawable/ic_language" />
+            android:title="@string/pref_tts_voice" />
 
         <Preference
+            android:icon="@drawable/ic_height"
             android:key="pref_tts_pitch"
-            android:title="@string/pref_tts_pitch"
             android:summary="@string/pref_tts_pitch_summary"
-            android:icon="@drawable/ic_height" />
+            android:title="@string/pref_tts_pitch" />
 
         <Preference
+            android:icon="@drawable/ic_speed"
             android:key="pref_tts_speech_rate"
-            android:title="@string/pref_tts_speech_rate"
             android:summary="@string/pref_tts_speech_rate_summary"
-            android:icon="@drawable/ic_speed" />
+            android:title="@string/pref_tts_speech_rate" />
 
         <Preference
+            android:icon="@android:drawable/ic_menu_preferences"
             android:key="pref_tts_system_settings"
-            android:title="@string/pref_tts_system_settings"
             android:summary="@string/pref_tts_system_settings_summary"
-            android:icon="@android:drawable/ic_menu_preferences" />
+            android:title="@string/pref_tts_system_settings" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_silence_category"
-        android:summary="@string/pref_silence_category_summary" >
+        android:summary="@string/pref_silence_category_summary"
+        android:title="@string/pref_silence_category">
 
         <ListPreference
-            android:key="pref_silence_line_endings"
-            android:title="@string/pref_silence_line_endings"
-            android:summary="@string/pref_silence_line_endings_summary"
+            android:defaultValue="200"
             android:dialogTitle="@string/pref_silence_line_endings"
             android:entries="@array/silence_entries"
             android:entryValues="@array/silence_values"
-            android:defaultValue="200" />
+            android:key="pref_silence_line_endings"
+            android:summary="@string/pref_silence_line_endings_summary"
+            android:title="@string/pref_silence_line_endings" />
 
         <ListPreference
-            android:key="pref_silence_sentences"
-            android:title="@string/pref_silence_sentences"
-            android:summary="@string/pref_silence_sentences_summary"
+            android:defaultValue="0"
             android:dialogTitle="@string/pref_silence_sentences"
             android:entries="@array/silence_entries"
             android:entryValues="@array/silence_values"
-            android:defaultValue="0" />
+            android:key="pref_silence_sentences"
+            android:summary="@string/pref_silence_sentences_summary"
+            android:title="@string/pref_silence_sentences" />
 
         <ListPreference
-            android:key="pref_silence_questions"
-            android:title="@string/pref_silence_questions"
-            android:summary="@string/pref_silence_questions_summary"
+            android:defaultValue="0"
             android:dialogTitle="@string/pref_silence_questions"
             android:entries="@array/silence_entries"
             android:entryValues="@array/silence_values"
-            android:defaultValue="0" />
+            android:key="pref_silence_questions"
+            android:summary="@string/pref_silence_questions_summary"
+            android:title="@string/pref_silence_questions" />
 
         <ListPreference
-            android:key="pref_silence_exclamations"
-            android:title="@string/pref_silence_exclamations"
-            android:summary="@string/pref_silence_exclamations_summary"
+            android:defaultValue="0"
             android:dialogTitle="@string/pref_silence_exclamations"
             android:entries="@array/silence_entries"
             android:entryValues="@array/silence_values"
-            android:defaultValue="0" />
+            android:key="pref_silence_exclamations"
+            android:summary="@string/pref_silence_exclamations_summary"
+            android:title="@string/pref_silence_exclamations" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_input_category"
-        android:summary="@string/pref_input_category_summary" >
+        android:summary="@string/pref_input_category_summary"
+        android:title="@string/pref_input_category">
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_playback_on_input"
-            android:title="@string/pref_playback_on_input"
             android:summary="@string/pref_playback_on_input_summary"
-            android:defaultValue="false" />
+            android:title="@string/pref_playback_on_input" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_scale_silence_to_rate"
-            android:title="@string/pref_scale_silence_to_rate"
             android:summary="@string/pref_scale_silence_to_rate_summary"
-            android:defaultValue="false" />
+            android:title="@string/pref_scale_silence_to_rate" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_filter_category"
-        android:summary="@string/pref_filter_category_summary" >
+        android:summary="@string/pref_filter_category_summary"
+        android:title="@string/pref_filter_category">
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_filter_hash"
-            android:title="@string/pref_filter_hash"
             android:summary="@string/pref_filter_hash_summary"
-            android:defaultValue="false" />
+            android:title="@string/pref_filter_hash" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_filter_web_links"
-            android:title="@string/pref_filter_web_links"
             android:summary="@string/pref_filter_web_links_summary"
-            android:defaultValue="false" />
+            android:title="@string/pref_filter_web_links" />
 
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="pref_filter_mailto_links"
-            android:title="@string/pref_filter_mailto_links"
             android:summary="@string/pref_filter_mailto_links_summary"
-            android:defaultValue="false" />
+            android:title="@string/pref_filter_mailto_links" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/pref_misc_category"
-        android:summary="@string/pref_misc_category_summary" >
+        android:summary="@string/pref_misc_category_summary"
+        android:title="@string/pref_misc_category">
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_misc_next_task_messages"
-            android:title="@string/pref_misc_next_task_messages"
             android:summary="@string/pref_misc_next_task_messages_summary"
-            android:defaultValue="true" />
+            android:title="@string/pref_misc_next_task_messages" />
 
     </PreferenceCategory>
 

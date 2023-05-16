@@ -49,8 +49,7 @@ var TextToSpeech.voiceEx: Voice?
             // Depending on the engine package, this can raise a
             // NullPointerException.
             voice
-        }
-        catch (error: NullPointerException) {
+        } catch (error: NullPointerException) {
             null
         }
     }
@@ -63,8 +62,8 @@ var TextToSpeech.voiceEx: Voice?
             // Log.e(TAG, "Setting voice to ${value?.name}")
             // val result = setVoice(value)
             // Log.e(TAG, "Voice set to ${voiceEx?.name}, result=$result")
+        } catch (error: NullPointerException) {
         }
-        catch (error: NullPointerException) {}
     }
 
 /**
@@ -86,8 +85,7 @@ val TextToSpeech.defaultVoiceEx: Voice?
             // Try to retrieve the current voice.
             // This can sometimes raise a NullPointerException.
             defaultVoice
-        }
-        catch (error: NullPointerException) {
+        } catch (error: NullPointerException) {
             null
         }
     }
@@ -109,8 +107,7 @@ val TextToSpeech.voicesEx: MutableSet<Voice?>
             // Try to retrieve the set of available voices.
             // This can sometimes raise a NullPointerException.
             voices
-        }
-        catch (error: NullPointerException) {
+        } catch (error: NullPointerException) {
             return mutableSetOf()
         }
     }
@@ -161,17 +158,21 @@ fun TextToSpeech.findAcceptableTTSLanguage(locale: Locale): Locale? {
             // This locale is acceptable.
             locale
         }
+
         TextToSpeech.LANG_COUNTRY_AVAILABLE -> {
             // Use the country language if the variant is unavailable.
             Locale(locale.language, locale.country)
         }
+
         TextToSpeech.LANG_AVAILABLE -> {
             // Use the general language if the country is unavailable.
             Locale(locale.language)
         }
+
         TextToSpeech.LANG_NOT_SUPPORTED -> {
             null
         }
+
         else -> null
     }
 }

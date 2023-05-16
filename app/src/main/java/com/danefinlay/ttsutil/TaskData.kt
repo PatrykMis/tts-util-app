@@ -23,17 +23,25 @@ package com.danefinlay.ttsutil
 import java.io.File
 
 sealed class TaskData(val taskId: Int, var progress: Int) {
-    class ReadInputTaskData(taskId: Int, progress: Int,
-                            val inputSource: InputSource,
-                            val queueMode: Int) :
-            TaskData(taskId, progress)
-    class FileSynthesisTaskData(taskId: Int, progress: Int,
-                                val inputSource: InputSource,
-                                val outDirectory: Directory,
-                                val waveFilename: String,
-                                val inWaveFiles: MutableList<File>) :
-            TaskData(taskId, progress)
-    class ProcessWaveFilesTaskData(taskId: Int, progress: Int,
-                                   val prevTaskData: FileSynthesisTaskData) :
-            TaskData(taskId, progress)
+    class ReadInputTaskData(
+        taskId: Int, progress: Int,
+        val inputSource: InputSource,
+        val queueMode: Int
+    ) :
+        TaskData(taskId, progress)
+
+    class FileSynthesisTaskData(
+        taskId: Int, progress: Int,
+        val inputSource: InputSource,
+        val outDirectory: Directory,
+        val waveFilename: String,
+        val inWaveFiles: MutableList<File>
+    ) :
+        TaskData(taskId, progress)
+
+    class ProcessWaveFilesTaskData(
+        taskId: Int, progress: Int,
+        val prevTaskData: FileSynthesisTaskData
+    ) :
+        TaskData(taskId, progress)
 }

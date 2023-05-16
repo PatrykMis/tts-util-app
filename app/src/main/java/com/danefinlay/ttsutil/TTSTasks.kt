@@ -35,15 +35,12 @@ import androidx.annotation.CallSuper
 import androidx.preference.PreferenceManager
 import org.jetbrains.anko.*
 import java.io.*
-import java.lang.StringBuilder
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 abstract class MyUtteranceProgressListener(ctx: Context, val tts: TextToSpeech) :
-        UtteranceProgressListener() {
+    UtteranceProgressListener() {
 
     val app = ctx.applicationContext as ApplicationEx
 
@@ -75,16 +72,18 @@ abstract class MyUtteranceProgressListener(ctx: Context, val tts: TextToSpeech) 
 }
 
 
-abstract class TTSTask(ctx: Context, tts: TextToSpeech,
-                       private val inputStream: InputStream,
-                       private val inputSize: Long,
-                       private val taskId: Int,
-                       private val observer: TaskProgressObserver) :
-        MyUtteranceProgressListener(ctx, tts), Task {
+abstract class TTSTask(
+    ctx: Context, tts: TextToSpeech,
+    private val inputStream: InputStream,
+    private val inputSize: Long,
+    private val taskId: Int,
+    private val observer: TaskProgressObserver
+) :
+    MyUtteranceProgressListener(ctx, tts), Task {
 
     private val streamReader: Reader = inputStream.reader().buffered(maxInputLength)
     protected val utteranceBytesQueue: MutableList<Int> =
-            Collections.synchronizedList(mutableListOf<Int>())
+        Collections.synchronizedList(mutableListOf<Int>())
 
     private val scaleSilenceToRate: Boolean
     private val speechRate: Float
@@ -128,18 +127,18 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
         // Set the delimiters to silence map, aliasing the Unicode "halfwidth" and
         // "fullwidth" forms as necessary.
         delimitersToSilenceMap = mapOf(
-                // Line Feed (\n).
-                0x000a to silLF,
+            // Line Feed (\n).
+            0x000a to silLF,
 
-                // Sentences:
-                // Full stops.                  Ellipses.
-                0x002e to sentenceSil,          0x2026 to sentenceSil,
-                0xff0e to sentenceSil,
-                0xff61 to sentenceSil,
+            // Sentences:
+            // Full stops.                  Ellipses.
+            0x002e to sentenceSil, 0x2026 to sentenceSil,
+            0xff0e to sentenceSil,
+            0xff61 to sentenceSil,
 
-                // Questions.                   Exclamations.
-                0x003f to questionSil,          0x0021 to excSil,
-                0xff1f to questionSil,          0xff01 to excSil,
+            // Questions.                   Exclamations.
+            0x003f to questionSil, 0x0021 to excSil,
+            0xff1f to questionSil, 0xff01 to excSil,
         )
 
         // The set of end-of-text delimiters includes all non-whitespace delimiters.
@@ -193,16 +192,22 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
             // If there is a match, try to parse the string using Java's URL class,
             // which is imperfect, but good enough for this use case.
             if (result) {
-                result = try { URL(lowerCaseWord); true }
-                catch (e: MalformedURLException) { false }
+                result = try {
+                    URL(lowerCaseWord); true
+                } catch (e: MalformedURLException) {
+                    false
+                }
             }
         }
 
         // Check for mailto hyperlinks, if appropriate.
         if (!result && filterMailToLinks) {
             val lowerCaseWord = word.lowercase(Locale.ROOT)
-            result = try { MailTo.parse(lowerCaseWord); true }
-            catch (e: ParseException) { false }
+            result = try {
+                MailTo.parse(lowerCaseWord); true
+            } catch (e: ParseException) {
+                false
+            }
         }
         return result
     }
@@ -275,7 +280,8 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
                 if (byte in endOfTextDelimiters) {
                     val lastChar = buffer.lastOrNull()
                     if (lastChar != null && !lastChar.isWhitespace() &&
-                            lastChar.code !in delimitersToSilenceMap) break
+                        lastChar.code !in delimitersToSilenceMap
+                    ) break
                 }
 
                 // This is a whitespace delimiter: break.
@@ -326,9 +332,10 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
         // If any input was filtered, display a toast message.
         if (inputFiltered > 0) {
             val message = app.getString(
-                    R.string.filtered_characters_message,
-                    inputFiltered, app.resources.getQuantityString(
-                    R.plurals.characters, inputFiltered.toInt())
+                R.string.filtered_characters_message,
+                inputFiltered, app.resources.getQuantityString(
+                    R.plurals.characters, inputFiltered.toInt()
+                )
             )
             displayMessage(message, false)
         }
@@ -349,7 +356,7 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
 
     private fun handleProcessingError(errorCode: Int) {
         // Get the matching error message string for errorCode.
-        val errorMsg =  when (errorCode) {
+        val errorMsg = when (errorCode) {
             ERROR_SYNTHESIS -> R.string.synthesis_error_msg_synthesis
             ERROR_SERVICE -> R.string.synthesis_error_msg_service
             ERROR_OUTPUT -> R.string.synthesis_error_msg_output
@@ -417,6 +424,7 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
                 // another whitespace character before hitting the absolute maximum.
                 getMaxSpeechInputLength() - 1
             }
+
             else -> {
                 // Note: This value seems to work all right with Pico TTS on Android
                 // 4.0.3 (SDK 15).
@@ -434,11 +442,15 @@ abstract class TTSTask(ctx: Context, tts: TextToSpeech,
 }
 
 
-class ReadInputTask(ctx: Context, tts: TextToSpeech, inputStream: InputStream,
-                    inputSize: Long, private val queueMode: Int,
-                    observer: TaskProgressObserver) :
-        TTSTask(ctx, tts, inputStream, inputSize, TASK_ID_READ_TEXT,
-                observer) {
+class ReadInputTask(
+    ctx: Context, tts: TextToSpeech, inputStream: InputStream,
+    inputSize: Long, private val queueMode: Int,
+    observer: TaskProgressObserver
+) :
+    TTSTask(
+        ctx, tts, inputStream, inputSize, TASK_ID_READ_TEXT,
+        observer
+    ) {
 
     override fun begin(): Boolean {
         // Request audio focus.  Finish early if our request was denied.
@@ -477,8 +489,7 @@ class ReadInputTask(ctx: Context, tts: TextToSpeech, inputStream: InputStream,
             bundle.putInt(Engine.KEY_PARAM_STREAM, audioStream)
             @Suppress("deprecation")
             tts.speak(text, queueMode, bundle, uttId)
-        }
-        else {
+        } else {
             val params = HashMap<String, String>()
             params[KEY_PARAM_UTTERANCE_ID] = uttId
             params[Engine.KEY_PARAM_STREAM] = "$audioStream"
@@ -502,13 +513,17 @@ class ReadInputTask(ctx: Context, tts: TextToSpeech, inputStream: InputStream,
     }
 }
 
-class FileSynthesisTask(ctx: Context, tts: TextToSpeech,
-                        inputStream: InputStream, inputSize: Long,
-                        private val waveFilename: String,
-                        private val inWaveFiles: MutableList<File>,
-                        progressObserver: TaskProgressObserver) :
-        TTSTask(ctx, tts, inputStream, inputSize,
-                TASK_ID_WRITE_FILE, progressObserver) {
+class FileSynthesisTask(
+    ctx: Context, tts: TextToSpeech,
+    inputStream: InputStream, inputSize: Long,
+    private val waveFilename: String,
+    private val inWaveFiles: MutableList<File>,
+    progressObserver: TaskProgressObserver
+) :
+    TTSTask(
+        ctx, tts, inputStream, inputSize,
+        TASK_ID_WRITE_FILE, progressObserver
+    ) {
 
     override fun begin(): Boolean {
         // Delete silent wave files because they may be incompatible with current

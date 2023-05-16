@@ -66,8 +66,10 @@ fun Uri.isAccessibleFile(ctx: Context): Boolean {
         }
 
         // Test with a query.
-        val cursor = ctx.contentResolver.query(this, arrayOf(), null,
-                null, null)
+        val cursor = ctx.contentResolver.query(
+            this, arrayOf(), null,
+            null, null
+        )
         cursor?.close()
 
         // The file is accessible.
@@ -95,11 +97,13 @@ fun Uri.retrieveFileDisplayName(ctx: Context, takePermission: Boolean): String? 
     // Retrieve the display name, falling back on the URI's last path segment, if
     // there is one.
     val columnName = MediaStore.MediaColumns.DISPLAY_NAME
-    val cursor = ctx.contentResolver.query(this, arrayOf(columnName),
-            null, null, null)
+    val cursor = ctx.contentResolver.query(
+        this, arrayOf(columnName),
+        null, null, null
+    )
     cursor?.use {
         while (it.moveToNext()) {
-            val index =  cursor.getColumnIndex(columnName)
+            val index = cursor.getColumnIndex(columnName)
             if (index != -1) {
                 return cursor.getString(index)
             }
@@ -126,7 +130,7 @@ fun Uri.retrieveDirDisplayName(ctx: Context): String {
     // Use a description of the storage volume instead, if appropriate.
     if (this.path?.endsWith(":") == true) {
         val volumeDesc = documentFile?.uri
-                ?.resolveStorageVolumeDescription(ctx)
+            ?.resolveStorageVolumeDescription(ctx)
         if (volumeDesc != null) displayName = volumeDesc
     }
 
@@ -179,8 +183,10 @@ fun Uri.getFileSize(ctx: Context): Long? {
  *
  * Read permission is taken prior to opening the input stream, if requested.
  */
-fun Uri.openContentInputStream(ctx: Context,
-                               takePermission: Boolean): InputStream? {
+fun Uri.openContentInputStream(
+    ctx: Context,
+    takePermission: Boolean
+): InputStream? {
     // Take read permission, if necessary.
     if (takePermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         takeReadUriPermission(ctx)
@@ -197,8 +203,10 @@ fun Uri.openContentInputStream(ctx: Context,
  *
  * Write permission is taken prior to opening the output stream, if requested.
  */
-fun Uri.openContentOutputStream(ctx: Context,
-                                takePermission: Boolean): OutputStream? {
+fun Uri.openContentOutputStream(
+    ctx: Context,
+    takePermission: Boolean
+): OutputStream? {
     // Take write permission, if necessary.
     if (takePermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         takeWriteUriPermission(ctx)

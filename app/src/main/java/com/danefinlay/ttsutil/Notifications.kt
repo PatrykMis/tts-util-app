@@ -30,24 +30,30 @@ import androidx.core.app.NotificationCompat
 import com.danefinlay.ttsutil.ui.MainActivity
 import org.jetbrains.anko.notificationManager
 
-val notificationTasks = listOf(TASK_ID_READ_TEXT, TASK_ID_WRITE_FILE,
-        TASK_ID_PROCESS_FILE)
+val notificationTasks = listOf(
+    TASK_ID_READ_TEXT, TASK_ID_WRITE_FILE,
+    TASK_ID_PROCESS_FILE
+)
 
 
 fun getNotificationTitle(ctx: Context, taskData: TaskData): String {
     val titleId = when (taskData) {
         is TaskData.ReadInputTaskData ->
             R.string.reading_notification_title
+
         is TaskData.FileSynthesisTaskData ->
             R.string.synthesis_notification_title
+
         is TaskData.ProcessWaveFilesTaskData ->
             R.string.post_synthesis_notification_title
     }
     return ctx.getString(titleId)
 }
 
-fun getNotificationText(ctx: Context, taskData: TaskData,
-                        remainingTasks: Int): String {
+fun getNotificationText(
+    ctx: Context, taskData: TaskData,
+    remainingTasks: Int
+): String {
     // Example: "Reading from abc.txt…
     //           2 tasks remaining."
     val textId = R.string.progress_notification_text
@@ -58,18 +64,22 @@ fun getNotificationText(ctx: Context, taskData: TaskData,
             beginTextId = R.string.begin_reading_source_message
             srcDescription = taskData.inputSource.description
         }
+
         is TaskData.FileSynthesisTaskData -> {
             beginTextId = R.string.begin_synthesizing_source_message
             srcDescription = taskData.inputSource.description
         }
+
         is TaskData.ProcessWaveFilesTaskData -> {
             beginTextId = R.string.begin_processing_source_message
             srcDescription = taskData.prevTaskData.inputSource.description
         }
     }
     val beginText = ctx.getString(beginTextId, srcDescription)
-    return ctx.getString(textId, beginText, remainingTasks,
-            ctx.resources.getQuantityString(R.plurals.tasks, remainingTasks))
+    return ctx.getString(
+        textId, beginText, remainingTasks,
+        ctx.resources.getQuantityString(R.plurals.tasks, remainingTasks)
+    )
 }
 
 fun getNotificationBuilder(ctx: Context, taskId: Int): NotificationCompat.Builder {
@@ -80,15 +90,18 @@ fun getNotificationBuilder(ctx: Context, taskId: Int): NotificationCompat.Builde
         addFlags(START_ACTIVITY_FLAGS)
     }
     val contentPendingIntent = PendingIntent.getActivity(
-            ctx, 0, onClickIntent, 0)
+        ctx, 0, onClickIntent, 0
+    )
 
     // Just stop speaking for the delete intent (notification dismissal).
     val onDeleteIntent = Intent(ctx, TTSIntentService::class.java).apply {
         action = ACTION_STOP_SPEAKING
         putExtra("taskId", taskId)
     }
-    val onDeletePendingIntent = PendingIntent.getService(ctx,
-            0, onDeleteIntent, 0)
+    val onDeletePendingIntent = PendingIntent.getService(
+        ctx,
+        0, onDeleteIntent, 0
+    )
 
     // Set up the notification
     // Use the correct notification builder method
@@ -97,10 +110,11 @@ fun getNotificationBuilder(ctx: Context, taskId: Int): NotificationCompat.Builde
             val id = ctx.getString(R.string.app_name)
             val importance = NotificationManager.IMPORTANCE_LOW
             ctx.notificationManager.createNotificationChannel(
-                    NotificationChannel(id, id, importance)
+                NotificationChannel(id, id, importance)
             )
             NotificationCompat.Builder(ctx, id)
         }
+
         else -> {
             @Suppress("DEPRECATION")
             NotificationCompat.Builder(ctx)
@@ -122,8 +136,10 @@ fun getNotificationBuilder(ctx: Context, taskId: Int): NotificationCompat.Builde
 
         // Add a notification action for stop speaking.
         // Re-use the delete intent.
-        addAction(android.R.drawable.ic_delete,
-                ctx.getString(R.string.stop_button),
-                onDeletePendingIntent)
+        addAction(
+            android.R.drawable.ic_delete,
+            ctx.getString(R.string.stop_button),
+            onDeletePendingIntent
+        )
     }
 }

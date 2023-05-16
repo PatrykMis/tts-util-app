@@ -27,11 +27,11 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.Voice
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.preference.PreferenceManager
 import com.danefinlay.ttsutil.*
 import org.jetbrains.anko.longToast
@@ -57,8 +57,10 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
     private var positiveButtonPressed: Boolean = false
     private var neutralButtonPressed: Boolean = false
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?,
-                                     rootKey: String?) {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?
+    ) {
         // Load the preferences from an XML resource.
         setPreferencesFromResource(R.xml.prefs, rootKey)
     }
@@ -73,8 +75,10 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         return super.onPreferenceTreeClick(preference)
     }
 
-    private fun reinitialiseTTS(preferredEngine: String?,
-                                preInitFunction: (() -> Unit)? = null) {
+    private fun reinitialiseTTS(
+        preferredEngine: String?,
+        preInitFunction: (() -> Unit)? = null
+    ) {
         // Refuse to reinitialise TTS if there is a running task.
         // It is okay if the running task is our sample text.
         if (myApplication.taskInProgress && !sampleInProgress) {
@@ -98,8 +102,10 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
                 // Speak sample text and handle the result.
                 // We use QUEUE_FLUSH because it is more appropriate.
                 // Note: The input source description won't be used.
-                val inputSource = InputSource.CharSequence(event.sampleText,
-                        "sample text")
+                val inputSource = InputSource.CharSequence(
+                    event.sampleText,
+                    "sample text"
+                )
                 val result = app.enqueueReadInputTask(inputSource, QUEUE_FLUSH)
                 if (result == SUCCESS) {
                     sampleInProgress = true
@@ -107,11 +113,13 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
                     app.handleTTSOperationResult(result)
                 }
             }
+
             is ActivityEvent.StatusUpdateEvent -> {
                 if (event.progress == 100 && event.taskId == TASK_ID_READ_TEXT) {
                     onPostSample()
                 }
             }
+
             else -> {}
         }
     }
@@ -132,8 +140,10 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun playSampleWithVoice(tts: TextToSpeech, currentVoice: Voice?,
-                                    voice: Voice) {
+    private fun playSampleWithVoice(
+        tts: TextToSpeech, currentVoice: Voice?,
+        voice: Voice
+    ) {
         // Temporarily set the voice.
         tts.voiceEx = voice
 
@@ -223,10 +233,12 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         return true
     }
 
-    private fun buildAlertDialog(title: Int, items: List<String>,
-                                 checkedItem: Int,
-                                 onItemSelected: (index: Int) -> Unit,
-                                 onClickPositive: (index: Int) -> Unit):
+    private fun buildAlertDialog(
+        title: Int, items: List<String>,
+        checkedItem: Int,
+        onItemSelected: (index: Int) -> Unit,
+        onClickPositive: (index: Int) -> Unit
+    ):
             AlertDialog.Builder {
         positiveButtonPressed = false
         neutralButtonPressed = false
@@ -274,9 +286,11 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         return this
     }
 
-    private fun handleSetTtsEngine(preferenceKey: String,
-                                   prefs: SharedPreferences,
-                                   tts: TextToSpeech): Boolean {
+    private fun handleSetTtsEngine(
+        preferenceKey: String,
+        prefs: SharedPreferences,
+        tts: TextToSpeech
+    ): Boolean {
         // Get a list of the available TTS engines.
         val engines = tts.engines?.toList()?.sortedBy { it.label } ?: return true
         val engineNames = engines.map { it.label }
@@ -311,20 +325,24 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         }
 
         // Build and show the dialog.
-        val builder = buildAlertDialog(dialogTitle, engineNames, currentIndex,
-                onItemSelected, onClickPositive)
-                .setUseDefaultButton(onClickUseDefault)
-                .setCancelButton()
+        val builder = buildAlertDialog(
+            dialogTitle, engineNames, currentIndex,
+            onItemSelected, onClickPositive
+        )
+            .setUseDefaultButton(onClickUseDefault)
+            .setCancelButton()
         builder.show()
         return true
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun chooseVoiceSubSelection(prefs: SharedPreferences,
-                                        tts: TextToSpeech,
-                                        preferenceKey: String,
-                                        currentVoice: Voice?,
-                                        voiceSelection: List<Voice>) {
+    private fun chooseVoiceSubSelection(
+        prefs: SharedPreferences,
+        tts: TextToSpeech,
+        preferenceKey: String,
+        currentVoice: Voice?,
+        voiceSelection: List<Voice>
+    ) {
         // Get a list of display names, adding a number after each non-distinct
         // name.
         // TODO Add "(network required)" before the number for voices that require
@@ -333,7 +351,7 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         //  placed in strings.xml.
         val displayName = voiceSelection[0].locale.displayName
         val displayNames = voiceSelection
-                .mapIndexed { i, _ -> "$displayName ${i + 1}" }
+            .mapIndexed { i, _ -> "$displayName ${i + 1}" }
 
         // Define callbacks.
         val onClickPositive = { index: Int ->
@@ -346,7 +364,7 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
             // Set the voice's name in the preferences.
             prefs.edit().putString(preferenceKey, selectedVoice.name)
-                    .apply()
+                .apply()
         }
         val onItemSelected = { index: Int ->
             // Play sample text with the selected voice, if possible.
@@ -364,16 +382,20 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
         // Build and show the dialog.
         val dialogTitle = R.string.pref_tts_voice_summary
-        val builder = buildAlertDialog(dialogTitle, displayNames, currentIndex,
-                onItemSelected, onClickPositive)
-                .setCancelButton()
-                .setOnDismiss(onDismiss)
+        val builder = buildAlertDialog(
+            dialogTitle, displayNames, currentIndex,
+            onItemSelected, onClickPositive
+        )
+            .setCancelButton()
+            .setOnDismiss(onDismiss)
         builder.show()
     }
 
-    private fun handleSetTtsVoice(preferenceKey: String,
-                                  prefs: SharedPreferences,
-                                  tts: TextToSpeech): Boolean {
+    private fun handleSetTtsVoice(
+        preferenceKey: String,
+        prefs: SharedPreferences,
+        tts: TextToSpeech
+    ): Boolean {
         // Return early if this is not Android Lollipop (21) or above.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             context?.longToast(R.string.sdk_18_choose_tts_voice_message)
@@ -402,7 +424,7 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
         // select from.
         val voicesByDisplayName = voicesList.groupBy { it.locale.displayName }
         val displayNames = voicesByDisplayName.map { it.value[0].locale }
-                .sortedBy { it.displayLanguage }.map { it.displayName }
+            .sortedBy { it.displayLanguage }.map { it.displayName }
         val currentIndex: Int = if (currentVoice == null) -1 else {
             displayNames.indexOf(currentVoice.locale.displayName)
         }
@@ -425,8 +447,10 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
             if (voiceSelection.size > 1) {
                 // Display another dialog to the user for selection.
-                chooseVoiceSubSelection(prefs, tts, preferenceKey, currentVoice,
-                        voiceSelection)
+                chooseVoiceSubSelection(
+                    prefs, tts, preferenceKey, currentVoice,
+                    voiceSelection
+                )
             } else {
                 // There is no sense in showing another dialog for only one option.
                 // Set the first and only voice in the selection.
@@ -438,7 +462,7 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
                 // Set the voice's name in the preferences.
                 prefs.edit().putString(preferenceKey, selectedVoice.name)
-                        .apply()
+                    .apply()
             }
         }
         val onClickUseDefault = {
@@ -457,17 +481,21 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
         // Build and show the dialog.
         val dialogTitle = R.string.pref_tts_voice_summary
-        val builder = buildAlertDialog(dialogTitle, displayNames, currentIndex,
-                onItemSelected, onClickPositive)
-                .setUseDefaultButton(onClickUseDefault)
-                .setOnDismiss(onDismiss)
+        val builder = buildAlertDialog(
+            dialogTitle, displayNames, currentIndex,
+            onItemSelected, onClickPositive
+        )
+            .setUseDefaultButton(onClickUseDefault)
+            .setOnDismiss(onDismiss)
         builder.show()
         return true
     }
 
-    private fun handleSetTtsPitch(preferenceKey: String,
-                                  prefs: SharedPreferences,
-                                  tts: TextToSpeech): Boolean {
+    private fun handleSetTtsPitch(
+        preferenceKey: String,
+        prefs: SharedPreferences,
+        tts: TextToSpeech
+    ): Boolean {
         // Define a list of pitch values and their string representations.
         val pitches = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
         val pitchStrings = pitches.map { it.toString() }
@@ -508,21 +536,27 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
         // Build and show the dialog.
         val dialogTitle = R.string.pref_tts_pitch_summary
-        val builder = buildAlertDialog(dialogTitle, pitchStrings, currentIndex,
-                onItemSelected, onClickPositive)
-                .setUseDefaultButton(onClickUseDefault)
-                .setCancelButton()
-                .setOnDismiss(onDismiss)
+        val builder = buildAlertDialog(
+            dialogTitle, pitchStrings, currentIndex,
+            onItemSelected, onClickPositive
+        )
+            .setUseDefaultButton(onClickUseDefault)
+            .setCancelButton()
+            .setOnDismiss(onDismiss)
         builder.show()
         return true
     }
 
-    private fun handleSetTtsSpeechRate(preferenceKey: String,
-                                       prefs: SharedPreferences,
-                                       tts: TextToSpeech): Boolean {
+    private fun handleSetTtsSpeechRate(
+        preferenceKey: String,
+        prefs: SharedPreferences,
+        tts: TextToSpeech
+    ): Boolean {
         // Define a list of speech rate values and their string representations.
-        val speechRates = listOf(0.25f, 0.5f, 0.75f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f,
-                4.0f, 5.0f)
+        val speechRates = listOf(
+            0.25f, 0.5f, 0.75f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f,
+            4.0f, 5.0f
+        )
         val speechRateStrings = speechRates.map { it.toString() }
 
         // Get the previous or default speech rate value.
@@ -563,11 +597,13 @@ class SettingsFragment : PreferenceFragmentCompat(), FragmentInterface {
 
         // Build and show the dialog.
         val dialogTitle = R.string.pref_tts_speech_rate_summary
-        val builder = buildAlertDialog(dialogTitle, speechRateStrings, currentIndex,
-                onItemSelected,onClickPositive)
-                .setUseDefaultButton(onClickUseDefault)
-                .setCancelButton()
-                .setOnDismiss(onDismiss)
+        val builder = buildAlertDialog(
+            dialogTitle, speechRateStrings, currentIndex,
+            onItemSelected, onClickPositive
+        )
+            .setUseDefaultButton(onClickUseDefault)
+            .setCancelButton()
+            .setOnDismiss(onDismiss)
         builder.show()
         return true
     }

@@ -59,8 +59,10 @@ fun Context.getClipboardText(): String? {
     return text
 }
 
-inline fun Context.useClipboardText(block: Boolean,
-                                    crossinline function: (String?) -> Unit) {
+inline fun Context.useClipboardText(
+    block: Boolean,
+    crossinline function: (String?) -> Unit
+) {
     // Get the clipboard text.
     val text = getClipboardText()
 

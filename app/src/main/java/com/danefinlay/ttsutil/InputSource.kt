@@ -36,17 +36,19 @@ sealed class InputSource(val description: kotlin.CharSequence) {
     abstract fun getSize(ctx: Context): Long?
     abstract fun openInputStream(ctx: Context): InputStream?
 
-    class CharSequence(val text: kotlin.CharSequence,
-                       description: kotlin.CharSequence) :
-            InputSource(description) {
+    class CharSequence(
+        val text: kotlin.CharSequence,
+        description: kotlin.CharSequence
+    ) :
+        InputSource(description) {
         override fun isSourceAvailable(ctx: Context): Boolean = true
         override fun getSize(ctx: Context): Long = text.length.toLong()
         override fun openInputStream(ctx: Context): InputStream =
-                ByteArrayInputStream(text.toString().toByteArray())
+            ByteArrayInputStream(text.toString().toByteArray())
     }
 
     class DocumentUri(val uri: Uri?, description: kotlin.CharSequence) :
-            InputSource(description) {
+        InputSource(description) {
         private val file: File?
 
         init {

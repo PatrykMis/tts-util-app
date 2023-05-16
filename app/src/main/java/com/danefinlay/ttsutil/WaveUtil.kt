@@ -25,7 +25,7 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder.LITTLE_ENDIAN
 
-class IncompatibleWaveFileException(message: String): RuntimeException(message)
+class IncompatibleWaveFileException(message: String) : RuntimeException(message)
 
 
 // Define a few convenient byte-related extension functions.
@@ -106,7 +106,8 @@ class WaveFileHeader {
         }
 
         @CallSuper
-        open fun validateFields() {}
+        open fun validateFields() {
+        }
 
         @CallSuper
         open fun writeToArray(array: ByteArray, startIndex: Int): Int {
@@ -124,8 +125,10 @@ class WaveFileHeader {
         val bFormat: ByteArray
         val format: String
 
-        constructor(chunkHeader: ChunkHeader,
-                    stream: InputStream) : super(chunkHeader) {
+        constructor(
+            chunkHeader: ChunkHeader,
+            stream: InputStream
+        ) : super(chunkHeader) {
             this.bFormat = stream.read(4)
             this.format = bFormat.toAsciiString()
             if (format != "WAVE") {
@@ -134,8 +137,10 @@ class WaveFileHeader {
             }
         }
 
-        constructor(ckId: String, ckSize: Int,
-                    format: String) : super(ckId, ckSize) {
+        constructor(
+            ckId: String, ckSize: Int,
+            format: String
+        ) : super(ckId, ckSize) {
             this.format = format
             this.bFormat = format.toByteArray()
         }
@@ -180,8 +185,10 @@ class WaveFileHeader {
         val extraParamsSize: Short?
         val bExtraParams: ByteArray?
 
-        constructor(chunkHeader: ChunkHeader,
-                    stream: InputStream) : super(chunkHeader) {
+        constructor(
+            chunkHeader: ChunkHeader,
+            stream: InputStream
+        ) : super(chunkHeader) {
             // Read the "fmt " sub-chunk.
             bAudioFormat = stream.read(2)
             bNumChannels = stream.read(2)
@@ -216,11 +223,13 @@ class WaveFileHeader {
             validateFields()
         }
 
-        constructor(ckId: String, ckSize: Int, audioFormat: Short,
-                    numChannels: Short, sampleRate: Int, byteRate: Int,
-                    blockAlign: Short, bitsPerSample: Short,
-                    extraParamsSize: Short?,
-                    bExtraParams: ByteArray?) : super(ckId, ckSize) {
+        constructor(
+            ckId: String, ckSize: Int, audioFormat: Short,
+            numChannels: Short, sampleRate: Int, byteRate: Int,
+            blockAlign: Short, bitsPerSample: Short,
+            extraParamsSize: Short?,
+            bExtraParams: ByteArray?
+        ) : super(ckId, ckSize) {
             this.audioFormat = audioFormat
             this.bAudioFormat = audioFormat.toLEByteArray()
             this.numChannels = numChannels
@@ -253,9 +262,11 @@ class WaveFileHeader {
         }
 
         fun copy(): FmtSubChunk {
-            return FmtSubChunk(ckId, ckSize, audioFormat, numChannels, sampleRate,
-                    byteRate, blockAlign, bitsPerSample, extraParamsSize,
-                    bExtraParams)
+            return FmtSubChunk(
+                ckId, ckSize, audioFormat, numChannels, sampleRate,
+                byteRate, blockAlign, bitsPerSample, extraParamsSize,
+                bExtraParams
+            )
         }
 
         override fun toString(): String {
@@ -301,8 +312,10 @@ class WaveFileHeader {
         val sampleLength: Int?
         val bSampleLength: ByteArray?
 
-        constructor(chunkHeader: ChunkHeader,
-                    stream: InputStream) : super(chunkHeader) {
+        constructor(
+            chunkHeader: ChunkHeader,
+            stream: InputStream
+        ) : super(chunkHeader) {
             // Read the "fact" sub-chunk.
             if (ckSize >= 4) {
                 bSampleLength = stream.read(4)
@@ -316,8 +329,10 @@ class WaveFileHeader {
             validateFields()
         }
 
-        constructor(ckId: String, ckSize: Int,
-                    sampleLength: Int?) : super(ckId, ckSize) {
+        constructor(
+            ckId: String, ckSize: Int,
+            sampleLength: Int?
+        ) : super(ckId, ckSize) {
             this.sampleLength = sampleLength
             this.bSampleLength = sampleLength?.toLEByteArray()
             validateFields()
@@ -424,8 +439,10 @@ class WaveFileHeader {
         dataSubChunk = DataSubChunk(dataSCkHeader)
     }
 
-    constructor(riffChunk: RIFFChunk, fmtSubChunk: FmtSubChunk,
-                factSubChunk: FactSubChunk?, dataSubChunk: DataSubChunk) {
+    constructor(
+        riffChunk: RIFFChunk, fmtSubChunk: FmtSubChunk,
+        factSubChunk: FactSubChunk?, dataSubChunk: DataSubChunk
+    ) {
         this.riffChunk = riffChunk
         this.fmtSubChunk = fmtSubChunk
         this.factSubChunk = factSubChunk
@@ -553,7 +570,7 @@ class WaveFile(val stream: InputStream) {
 
     @Suppress("unused")
     fun compatibleWith(other: WaveFile): Boolean =
-            header.compatibleWith(other.header)
+        header.compatibleWith(other.header)
 
     override fun toString(): String {
         return "${javaClass.simpleName}($header)"
@@ -561,8 +578,10 @@ class WaveFile(val stream: InputStream) {
 }
 
 interface JoinWaveFilesHandler {
-    fun jwfHandler(totalProgress: Int, currentFile: File?,
-                   fileProgress: Int): Boolean
+    fun jwfHandler(
+        totalProgress: Int, currentFile: File?,
+        fileProgress: Int
+    ): Boolean
 }
 
 /**
@@ -585,8 +604,10 @@ interface JoinWaveFilesHandler {
  * @exception   IncompatibleWaveFileException   Raised for invalid/incompatible Wave
  * files.
  */
-fun joinWaveFiles(inFiles: List<File>, outStream: OutputStream,
-                  handler: JoinWaveFilesHandler): Boolean {
+fun joinWaveFiles(
+    inFiles: List<File>, outStream: OutputStream,
+    handler: JoinWaveFilesHandler
+): Boolean {
     // Notify that work has begun, returning early if appropriate.
     val file1 = inFiles.firstOrNull()
     if (!handler.jwfHandler(0, file1, 0)) return false
@@ -604,7 +625,8 @@ fun joinWaveFiles(inFiles: List<File>, outStream: OutputStream,
     for (file in inFiles) {
         // Do not reread file headers unnecessarily.
         var header: WaveFileHeader? = fileToWfHeaderMap[file]
-        if (header != null) { wfHeaders.add(header); continue; }
+        if (header != null) {
+            wfHeaders.add(header); continue; }
 
         // Open a buffered input stream using a small buffer size and process the
         // file header.
@@ -614,9 +636,11 @@ fun joinWaveFiles(inFiles: List<File>, outStream: OutputStream,
         fileToWfHeaderMap[file] = header
         val wf1header = wfHeaders.first()
         if (!header.compatibleWith(wf1header)) {
-            throw IncompatibleWaveFileException("Wave files with " +
-                    "incompatible headers are not supported: " +
-                    "$header ~ $wf1header")
+            throw IncompatibleWaveFileException(
+                "Wave files with " +
+                        "incompatible headers are not supported: " +
+                        "$header ~ $wf1header"
+            )
         }
     }
 

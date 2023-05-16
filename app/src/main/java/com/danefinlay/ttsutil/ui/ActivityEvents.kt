@@ -23,18 +23,21 @@ package com.danefinlay.ttsutil.ui
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
+import java.util.Locale
 
 sealed class ActivityEvent : Parcelable {
-    class ChosenFileEvent(val uriList: List<Uri>,
-                          val displayNameList: List<String>,
-                          val locale: Locale,
-                          var requestCode: Int) : ActivityEvent() {
+    class ChosenFileEvent(
+        val uriList: List<Uri>,
+        val displayNameList: List<String>,
+        val locale: Locale,
+        var requestCode: Int
+    ) : ActivityEvent() {
         constructor(parcel: Parcel) : this(
-                parcel.createTypedArrayList(Uri.CREATOR)!!,
-                parcel.createStringArrayList()!!,
-                parcel.readSerializable() as Locale,
-                parcel.readInt())
+            parcel.createTypedArrayList(Uri.CREATOR)!!,
+            parcel.createStringArrayList()!!,
+            parcel.readSerializable() as Locale,
+            parcel.readInt()
+        )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeTypedList(uriList)
@@ -50,10 +53,10 @@ sealed class ActivityEvent : Parcelable {
 
         companion object CREATOR : Parcelable.Creator<ChosenFileEvent> {
             override fun createFromParcel(parcel: Parcel): ChosenFileEvent =
-                    ChosenFileEvent(parcel)
+                ChosenFileEvent(parcel)
 
             override fun newArray(size: Int): Array<ChosenFileEvent?> =
-                    arrayOfNulls(size)
+                arrayOfNulls(size)
         }
     }
 
@@ -63,15 +66,18 @@ sealed class ActivityEvent : Parcelable {
 
         companion object CREATOR : Parcelable.Creator<TTSReadyEvent> {
             override fun createFromParcel(parcel: Parcel): TTSReadyEvent =
-                    TTSReadyEvent()
+                TTSReadyEvent()
+
             override fun newArray(size: Int): Array<TTSReadyEvent?> =
-                    arrayOfNulls(size)
+                arrayOfNulls(size)
         }
     }
 
-    class StatusUpdateEvent(val progress: Int,
-                            val taskId: Int,
-                            val remainingTasks: Int) : ActivityEvent() {
+    class StatusUpdateEvent(
+        val progress: Int,
+        val taskId: Int,
+        val remainingTasks: Int
+    ) : ActivityEvent() {
         constructor(parcel: Parcel) :
                 this(parcel.readInt(), parcel.readInt(), parcel.readInt())
 
@@ -85,9 +91,10 @@ sealed class ActivityEvent : Parcelable {
 
         companion object CREATOR : Parcelable.Creator<StatusUpdateEvent> {
             override fun createFromParcel(parcel: Parcel): StatusUpdateEvent =
-                    StatusUpdateEvent(parcel)
+                StatusUpdateEvent(parcel)
+
             override fun newArray(size: Int): Array<StatusUpdateEvent?> =
-                    arrayOfNulls(size)
+                arrayOfNulls(size)
         }
     }
 
@@ -102,9 +109,10 @@ sealed class ActivityEvent : Parcelable {
 
         companion object CREATOR : Parcelable.Creator<SampleTextReceivedEvent> {
             override fun createFromParcel(parcel: Parcel): SampleTextReceivedEvent =
-                    SampleTextReceivedEvent(parcel)
+                SampleTextReceivedEvent(parcel)
+
             override fun newArray(size: Int): Array<SampleTextReceivedEvent?> =
-                    arrayOfNulls(size)
+                arrayOfNulls(size)
         }
     }
 }

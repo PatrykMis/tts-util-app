@@ -42,8 +42,8 @@ class EditReadActivity : TTSActivity() {
 
             // Show the instantiated fragment.
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit()
+                .replace(R.id.fragment_container, fragment)
+                .commit()
         }
     }
 

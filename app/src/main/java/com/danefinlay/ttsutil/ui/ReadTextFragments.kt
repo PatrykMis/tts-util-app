@@ -30,8 +30,6 @@ import android.os.Environment
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.QUEUE_ADD
 import android.speech.tts.TextToSpeech.QUEUE_FLUSH
-import com.google.android.material.textfield.TextInputLayout
-import androidx.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -39,7 +37,9 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.preference.PreferenceManager
 import com.danefinlay.ttsutil.*
+import com.google.android.material.textfield.TextInputLayout
 import org.jetbrains.anko.*
 
 abstract class ReadTextFragmentBase : MyFragment() {
@@ -81,7 +81,7 @@ abstract class ReadTextFragmentBase : MyFragment() {
     }
 
     protected class ScrollingEditTextOnTouchListener(val editText: EditText) :
-            View.OnTouchListener {
+        View.OnTouchListener {
         // Note:
         //
         //  The following accessibility warning is suppressed, here and later in
@@ -158,7 +158,8 @@ abstract class ReadTextFragmentBase : MyFragment() {
         super.onActivityCreated(savedInstanceState)
 
         // Initialize the input field here.
-        if (savedInstanceState == null) { initializeInputField(); return; }
+        if (savedInstanceState == null) {
+            initializeInputField(); return; }
 
         // Restore fragment instance state here.
         inputLayoutContent = savedInstanceState.getString("inputLayoutContent")
@@ -205,12 +206,14 @@ abstract class ReadTextFragmentBase : MyFragment() {
                 // now ready.
                 if (playbackOnStart) attemptPlaybackOnStart()
             }
+
             is ActivityEvent.ChosenFileEvent -> {
                 val code = event.requestCode
                 if (code == DIR_SELECT_CODE || code == DIR_SELECT_CONT_CODE) {
                     onDirChosen(event)
                 }
             }
+
             else -> {}
         }
     }
@@ -231,8 +234,10 @@ abstract class ReadTextFragmentBase : MyFragment() {
         myApplication.handleTTSOperationResult(result)
     }
 
-    private fun synthesizeTextToFile(waveFilename: String, directory: Directory,
-                                     storageAccess: Boolean) {
+    private fun synthesizeTextToFile(
+        waveFilename: String, directory: Directory,
+        storageAccess: Boolean
+    ) {
         if (!storageAccess) {
             // Show a dialog if we don't have read/write storage permission.
             // and return here if permission is granted.
@@ -247,8 +252,10 @@ abstract class ReadTextFragmentBase : MyFragment() {
         // handle the result.
         val text = inputLayoutContent ?: ""
         val inputSource = InputSource.CharSequence(text, textSourceDescription)
-        val result = myApplication.enqueueFileSynthesisTasks(inputSource, directory,
-                waveFilename)
+        val result = myApplication.enqueueFileSynthesisTasks(
+            inputSource, directory,
+            waveFilename
+        )
         when (result) {
             UNAVAILABLE_OUT_DIR -> buildUnavailableDirAlertDialog().show()
             UNWRITABLE_OUT_DIR -> buildUnwritableOutDirAlertDialog().show()
@@ -273,13 +280,17 @@ abstract class ReadTextFragmentBase : MyFragment() {
         // TODO Allow the user to change the filename.
         val waveFilename = getString(R.string.output_wave_filename) + ".wav"
         val dirDisplayName: String = event?.firstDisplayName
-                ?: getString(R.string.default_output_dir)
+            ?: getString(R.string.default_output_dir)
 
         // Build and display an appropriate alert dialog.
         AlertDialogBuilder(ctx).apply {
             title(R.string.write_to_file_alert_title)
-            message(getString(R.string.write_to_file_alert_message_3,
-                    waveFilename, dirDisplayName))
+            message(
+                getString(
+                    R.string.write_to_file_alert_message_3,
+                    waveFilename, dirDisplayName
+                )
+            )
             positiveButton(R.string.alert_positive_message_2) {
                 // Ask the user for write permission if necessary.
                 withStoragePermission { granted ->
@@ -317,9 +328,10 @@ class ReadTextFragment : ReadTextFragmentBase() {
     /**
      * Event listener for the memory buttons.
      */
-    private class MemoryButtonEventListener(val ctx: Context,
-                                            val memoryKey: String,
-                                            val fragment: ReadTextFragmentBase
+    private class MemoryButtonEventListener(
+        val ctx: Context,
+        val memoryKey: String,
+        val fragment: ReadTextFragmentBase
     ) : View.OnClickListener, View.OnLongClickListener {
 
         override fun onClick(v: View?) {
@@ -340,7 +352,7 @@ class ReadTextFragment : ReadTextFragmentBase() {
             val prefs = PreferenceManager.getDefaultSharedPreferences(ctx)
             val content = fragment.inputLayoutContent ?: ""
             val messageId = if (content.isEmpty()) R.string.mem_slot_cleared_msg
-                            else R.string.mem_slot_set_msg
+            else R.string.mem_slot_set_msg
             val editor: SharedPreferences.Editor = prefs.edit()
             editor.putString(memoryKey, content)
             editor.apply()
@@ -355,12 +367,14 @@ class ReadTextFragment : ReadTextFragmentBase() {
         get() = getString(R.string.read_text_source_description)
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_read_text, container,
-                false)
+        return inflater.inflate(
+            R.layout.fragment_read_text, container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -373,8 +387,10 @@ class ReadTextFragment : ReadTextFragmentBase() {
 
         // Set OnClick and OnLongClick event listeners for each memory button.
         val ctx = context /* Activity context */
-        val memoryButtons = listOf(R.id.Memory1, R.id.Memory2, R.id.Memory3,
-                R.id.Memory4, R.id.Memory5)
+        val memoryButtons = listOf(
+            R.id.Memory1, R.id.Memory2, R.id.Memory3,
+            R.id.Memory4, R.id.Memory5
+        )
         memoryButtons.forEachIndexed { i, id ->
             val button = find<ImageButton>(id)
             val memoryKey = "mem${i + 1}"  // mem1..mem4
@@ -441,12 +457,14 @@ class ReadClipboardFragment : ReadTextFragmentBase() {
         get() = getString(R.string.read_clipboard_source_description)
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_read_clipboard, container,
-                false)
+        return inflater.inflate(
+            R.layout.fragment_read_clipboard, container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

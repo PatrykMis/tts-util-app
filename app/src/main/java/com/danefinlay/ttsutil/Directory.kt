@@ -35,18 +35,22 @@ sealed class Directory {
     abstract fun exists(ctx: Context): Boolean
     abstract fun canRead(ctx: Context): Boolean
     abstract fun canWrite(ctx: Context): Boolean
-    abstract fun openDocumentOutputStream(ctx: Context,
-                                          documentName: String,
-                                          mimeType: String): OutputStream?
+    abstract fun openDocumentOutputStream(
+        ctx: Context,
+        documentName: String,
+        mimeType: String
+    ): OutputStream?
 
     class File(private val file: java.io.File) : Directory() {
         override fun exists(ctx: Context): Boolean = file.exists()
         override fun canRead(ctx: Context): Boolean = file.canRead()
         override fun canWrite(ctx: Context): Boolean = file.canWrite()
 
-        override fun openDocumentOutputStream(ctx: Context,
-                                              documentName: String,
-                                              mimeType: String): OutputStream? {
+        override fun openDocumentOutputStream(
+            ctx: Context,
+            documentName: String,
+            mimeType: String
+        ): OutputStream? {
             // Open an output stream on the specified file, if possible.
             val dir = this.file
             if (dir.canWrite()) {
@@ -62,7 +66,7 @@ sealed class Directory {
         private fun getDocumentFileDir(ctx: Context):
                 androidx.documentfile.provider.DocumentFile? {
             return androidx.documentfile.provider.DocumentFile
-                    .fromTreeUri(ctx, uri)
+                .fromTreeUri(ctx, uri)
         }
 
         override fun canRead(ctx: Context): Boolean {
@@ -74,7 +78,8 @@ sealed class Directory {
         }
 
         private fun isValidDirectory(
-                dir: androidx.documentfile.provider.DocumentFile): Boolean {
+            dir: androidx.documentfile.provider.DocumentFile
+        ): Boolean {
             return dir.isDirectory && dir.exists()
         }
 
@@ -83,17 +88,22 @@ sealed class Directory {
             return if (dir != null) isValidDirectory(dir) else false
         }
 
-        override fun openDocumentOutputStream(ctx: Context,
-                                              documentName: String,
-                                              mimeType: String): OutputStream? {
+        override fun openDocumentOutputStream(
+            ctx: Context,
+            documentName: String,
+            mimeType: String
+        ): OutputStream? {
             // Get a DocumentFile object using the specified URI.
-            val dir = androidx.documentfile.provider.DocumentFile.fromTreeUri(ctx,
-                    uri)
+            val dir = androidx.documentfile.provider.DocumentFile.fromTreeUri(
+                ctx,
+                uri
+            )
 
             // Return early if the directory is invalid or if we do not have read/
             // write permission.
             if (dir == null || !isValidDirectory(dir) || !dir.canRead() ||
-                    !dir.canWrite()) return null
+                !dir.canWrite()
+            ) return null
 
             // Create a new file, if necessary.
             var file = dir.findFile(documentName)

@@ -29,12 +29,14 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.OutputStream
 
-class ProcessWaveFilesTask(private val ctx: Context,
-                           private val observer: TaskProgressObserver,
-                           private val inWaveFiles: MutableList<File>,
-                           private val outputStream: OutputStream,
-                           private val finalWaveFilename: String):
-        Task, JoinWaveFilesHandler {
+class ProcessWaveFilesTask(
+    private val ctx: Context,
+    private val observer: TaskProgressObserver,
+    private val inWaveFiles: MutableList<File>,
+    private val outputStream: OutputStream,
+    private val finalWaveFilename: String
+) :
+    Task, JoinWaveFilesHandler {
 
     @Volatile
     private var finalize: Boolean = false
@@ -68,7 +70,8 @@ class ProcessWaveFilesTask(private val ctx: Context,
         val toRemoveAndDelete = inWaveFiles.filter { f ->
             f.length() < minFileSize && f.isFile && f.canWrite()
         }
-        for (f in toRemoveAndDelete) { inWaveFiles.remove(f);  f.delete(); }
+        for (f in toRemoveAndDelete) {
+            inWaveFiles.remove(f); f.delete(); }
 
         // Verify that the initialization data is correct.
         var success: Boolean
@@ -87,8 +90,10 @@ class ProcessWaveFilesTask(private val ctx: Context,
         return finish(success)
     }
 
-    private fun writeSilentWaveFile(file: File, header: WaveFileHeader,
-                                    durationInSeconds: Float) {
+    private fun writeSilentWaveFile(
+        file: File, header: WaveFileHeader,
+        durationInSeconds: Float
+    ) {
         // Determine the data sub-chunk size.  It should be an even integer.
         var dataSize = (header.fmtSubChunk.byteRate * durationInSeconds).toInt() + 1
         if (dataSize % 2 == 1) dataSize += 1
@@ -103,14 +108,16 @@ class ProcessWaveFilesTask(private val ctx: Context,
 
         // Write the audio data as zeros.
         var count = 0
-        do { outputStream.write(0); count++; }
-        while (count < silHeader.dataSubChunk.ckSize)
+        do {
+            outputStream.write(0); count++; } while (count < silHeader.dataSubChunk.ckSize)
         outputStream.flush()
         outputStream.close()
     }
 
-    override fun jwfHandler(totalProgress: Int, currentFile: File?,
-                            fileProgress: Int): Boolean {
+    override fun jwfHandler(
+        totalProgress: Int, currentFile: File?,
+        fileProgress: Int
+    ): Boolean {
         // Notify the progress observer of the procedure's total progress.
         // Note: progress=[-1, 100] are dispatched by finish().
         if (totalProgress in 0..99) {
@@ -120,7 +127,8 @@ class ProcessWaveFilesTask(private val ctx: Context,
         // Delete finished files, except the special ones for silence, which may be
         // needed later on in the procedure.
         if (fileProgress == 100 && currentFile != null &&
-                !currentFile.name.endsWith(SILENCE_FILE_SUFFIX)) {
+            !currentFile.name.endsWith(SILENCE_FILE_SUFFIX)
+        ) {
             currentFile.delete()
         }
 
@@ -134,7 +142,7 @@ class ProcessWaveFilesTask(private val ctx: Context,
 
         // Display an appropriate message to the user.
         val messageId = if (success) R.string.write_to_file_message_success
-                        else R.string.write_to_file_message_failure
+        else R.string.write_to_file_message_failure
         val message = ctx.getString(messageId, finalWaveFilename)
         ctx.runOnUiThread { longToast(message) }
 
